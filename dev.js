@@ -27,7 +27,9 @@ function scrapeData(){
     "Friend": /now friends/,
     "Comment": /commented on/,
     "Like": /like/,
-    "Changed": /changed/
+    "Changed": /changed/,
+    "Wall": /wrote on/,
+    "Other": /.+/
   };
   var geeky = Object.keys(groups);/*G(roup)KEY*/
   var gct = {};
@@ -37,7 +39,6 @@ function scrapeData(){
   var ct = 0;
   for(var k in groups){
     if(!gct[ct]) gct[ct] = 0;
-    if(!tmp[ct]) tmp[ct] = 0;
     if(!ydata[ct]) ydata[ct] = [];
     if(!xdata[ct]) xdata[ct] = [];
     ct++;
@@ -52,6 +53,7 @@ function scrapeData(){
           var ct = 0;
           for(var k in groups){
             if(tmp[ct]){
+              console.log('existing tmp[ct]',tmp[ct]);
               gct[ct] += tmp[ct];
               ydata[ct].push(gct[ct]);
               xdata[ct].push(dnum)
@@ -70,6 +72,7 @@ function scrapeData(){
       for(var k in groups){
         if(groups[k].test(post)){
 
+          if(!tmp[ct]) tmp[ct] = 0;
           console.log(k)
           tmp[ct]++;
           break;
@@ -91,8 +94,6 @@ var pad = 50;
 function drawCharts(){
     r.clear();
 
-
-    
     r.canvas.style.backgroundColor = '#EDEFF4';
     r.canvas.style.borderRadius = '20px';
     r.canvas.style.border = '1px solid #627AAD';
