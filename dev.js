@@ -62,7 +62,6 @@ function scrapeData(){
           var ct = 0;
           for(var k in groups){
             if(tmp[ct]){
-              console.log('existing tmp[ct]',tmp[ct]);
               gct[ct] += tmp[ct];
               ydata[ct].push(gct[ct]);
               xdata[ct].push(dnum)
