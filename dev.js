@@ -1,16 +1,28 @@
 //document.querySelector('.uiMorePager a')
+var all_posts_loaded = false;
 setInterval(function(){
-  (new Function(document.querySelector('.uiMorePager a').getAttribute('onclick')))()
+  //(new Function(document.querySelector('.uiMorePager a').getAttribute('onclick')))()
+  var etl = document.querySelector('.empty_wall .status h2');
+  if(etl && etl.innerHTML.indexOf('no more posts') != -1){
+    scrapeData();
+    all_posts_loaded = true
+    return;
+  }
+  
+  var evt = document.createEvent("MouseEvents");
+  evt.initMouseEvent("click", true, true, window,
+    0, 0, 0, 0, 0, false, false, false, false, 0, null);
+  document.querySelector('.uiMorePager a').dispatchEvent(evt);
 },4000);
 
-
+var posts = [];
 
 function scrapeData(){
   var namco = {}; //namecount
   
   var els = document.querySelectorAll('.notification, h6, div div div div[data-ft], abbr[data-date]'); //Hopefully generic selectors that will survive fb theme updates
-  var posts = [];
-  for(var i = els.length; i--; ){
+//  var posts = [];
+  for(var i = 0, q = els.length; i < q; i++){
     var el = els[i];
     if(!el){
       //move on...
@@ -26,6 +38,7 @@ function scrapeData(){
         namco[name]++;
       }
     }
+    el.parentNode.removeChild(el);
   }
 
   //.replace(/^.+?\s/g,'').indexOf('changed')
@@ -52,8 +65,7 @@ function scrapeData(){
     if(!xdata[ct]) xdata[ct] = [];
     ct++;
   }
-  for(var i = 0; i < posts.length; i++){
-
+  for(var i = posts.length; i--; ){
     if(posts[i].getTime){
       if(last_time){
       
@@ -73,7 +85,8 @@ function scrapeData(){
       tmp = {};
       last_time = posts[i]; 
       if(!first_time) first_time = posts[i];
-    } else {
+      
+    } else if(last_time) {
       var post = posts[i].trim().split('\n')[0].replace(/\xb7.*$/,'').replace(/Remove Post/g,'').trim();
       var ct = 0;
       //console.log(post)
@@ -92,6 +105,7 @@ function scrapeData(){
   window.posts = posts;
   window.ydata = ydata;
   window.namco = namco;
+  window.geeky = geeky;
   window.xdata = xdata;
 }
 
@@ -114,7 +128,9 @@ function drawCharts(){
     }).hoverColumn(function () {
         this.tags = r.set();
         for (var i = 0, ii = this.y.length; i < ii; i++) {
-            this.tags.push(r.g.tag(this.x, this.y[i], this.values[i] , 160, 10).insertBefore(this).attr([{fill: "#fff"}, {fill: this.symbols[i].attr("fill")}]));
+            this.tags.push(r.g.tag(this.x, this.y[i], geeky[i] + ' '+this.values[i] , 160, 10)
+              .insertBefore(this)
+              .attr([{fill: "#fff"}, {fill: this.symbols[i].attr("fill")}]));
         }
     }, function () {
         this.tags && this.tags.remove();
@@ -157,8 +173,11 @@ var next = function(){
     window.r = Raphael(pad, pad, innerWidth - 2*pad, 500);
     
     setInterval(function(){
-      scrapeData();
-      drawCharts();
+    
+      if(all_posts_loaded == false){
+        scrapeData();
+        drawCharts();
+      }
     }, 5000)
   }
 };
