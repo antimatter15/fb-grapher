@@ -1,3 +1,5 @@
+//javascript:(function(s){s=document.createElement('script');s.src='https://github.com/antimatter15/fb-grapher/raw/master/dev.js';document.body.appendChild(s)})()
+
 //document.querySelector('.uiMorePager a')
 var all_posts_loaded = false;
 setInterval(function(){
